@@ -1,0 +1,13 @@
+% identification
+\ProvidesFile{apj.cbx}[2015/08/01 Biblatex citation style for ApJ]
+
+% base citation style
+\RequireCitationStyle{authoryear-comp}
+\ExecuteBibliographyOptions{maxcitenames=2, mincitenames=1, uniquename=false,
+  uniquelist=false, sortcites=false}
+
+% remove the comma after [author]
+\renewcommand*\nameyeardelim{\addspace}
+
+% end
+\endinput

@@ -1,0 +1,283 @@
+% identification
+\ProvidesFile{apj.bbx}[2015/08/01 Biblatex bibliography style for ApJ]
+
+% base bibliography style
+\RequireBibliographyStyle{authoryear-comp}
+\ExecuteBibliographyOptions{useprefix=true, firstinits=true, maxbibnames=5,
+  minbibnames=3, sorting=nyc, isbn=false}
+
+% options
+\newtoggle{bbx:embedlinks}
+\DeclareBibliographyOption{embedlinks}[true]{\settoggle{bbx:embedlinks}{#1}}
+\DeclareBibliographyOption{doilinkcolor}{\def\bbx@doilinkcolor{#1}}
+\DeclareBibliographyOption{adslinkcolor}{\def\bbx@adslinkcolor{#1}}
+\DeclareBibliographyOption{arxivlinkcolor}{\def\bbx@arxivlinkcolor{#1}}
+\ExecuteBibliographyOptions{doilinkcolor=, adslinkcolor=, arxivlinkcolor=}
+
+% new [bibcode] field
+\DeclareSourcemap{
+  \maps[datatype=bibtex]{\map{
+    \step[fieldsource=bibcode, fieldtarget=verba]
+  }}
+}
+
+% redefined bibliography strings
+\DefineBibliographyStrings{english}{
+  byeditor={ed\adddot},
+  volume  ={Vol\adddot},
+  volumes ={Vols\adddot}
+}
+
+% ignored entries
+\AtEveryBibitem{%
+  \clearlist{language}%
+  \ifentrytype{article}{\clearfield{title}}{}%
+  \ifentrytype{inproceedings}{\clearfield{title}}{}%
+  \ifentrytype{incollection}{\clearfield{title}}{}%
+  \ifentrytype{report}{\clearfield{type}}{}%
+}
+
+% colored link
+\newcommand*\bbx@href[3]{%
+  \ifx\@empty#1\@empty
+    \href{#2}{#3}%
+  \else\begingroup
+    \protected@edef\@tempa{{urlcolor=#1}}\expandafter\hypersetup\@tempa
+    \href{#2}{#3}%
+  \endgroup\fi}
+
+% utility macros
+\newcommand*\bbx@applytomacro[2]{%
+  \expandafter#1\csname abx@macro@\detokenize{#2}\endcsname}
+\newcommand*\bbx@applytodriver[2]{%
+  \expandafter#1\csname blx@bbx@\detokenize{#2}\endcsname}
+\newcommand*\bbx@applytofieldformat[2]{%
+  \expandafter#1\csname abx@ffd@*@\detokenize{#2}\endcsname}
+\newcommand*\bbx@patchmacro[3]{%
+  \bbx@applytomacro\patchcmd{#1}{#2}{#3}
+  {}{\PackageWarning{biblatex}{Cannot patch bibliography macro #1}}}
+\newcommand*\bbx@patchdriver[3]{%
+  \bbx@applytodriver\patchcmd{#1}{#2}{#3}
+  {}{\PackageWarning{biblatex}{Cannot patch bibliography driver #1}}}
+\newcommand*\bbx@patchfieldformat[3]{%
+  \bbx@applytofieldformat\patchcmd{#1}{#2}{#3}
+  {}{\PackageWarning{biblatex}{Cannot patch field format #1}}}
+\newcommand*\bbx@apptomacro[2]{%
+  \bbx@applytomacro\apptocmd{#1}{#2}
+  {}{\PackageWarning{biblatex}{Cannot append to bibliography macro #1}}}
+
+% change the default punctuation between units
+\renewcommand*\newunitpunct{\addcomma\space}
+
+% always put last names before first names
+\DeclareNameAlias{sortname}{last-first}
+
+% always use an em dash when [author] is repeated from above
+\renewcommand*\bibnamedash{\printtext{\textemdash}}
+
+% change 'and' in [author] list to an ampersand (also affects citations)
+\renewcommand*\finalnamedelim
+  {\ifbibliography{\finalandcomma}{}\addspace\&\space}
+
+% terminate the [author] unit forcibly with a period
+\renewcommand*\labelnamepunct{\addperiod\space}
+\@for\bbx@entrytype:=article,book,booklet,collection,inbook,incollection,%
+  inproceedings,manual,misc,online,patent,periodical,proceedings,report,%
+  thesis,unpublished\do{
+  \expandafter\bbx@patchdriver\expandafter{\bbx@entrytype}
+    {\setunit{\labelnamepunct}}
+    {\printunit{\labelnamepunct}}}
+
+% remove the parentheses around [year]
+\bbx@patchmacro{date+extrayear}{[parens]}{}
+
+% remove [year] from the [author] list
+\bbx@patchmacro{author}{\usebibmacro{date+extrayear}}{}
+\bbx@patchmacro{bbx:editor}{\usebibmacro{date+extrayear}}{}
+\bbx@patchmacro{bbx:translator}{\usebibmacro{date+extrayear}}{}
+
+% replace [year] where a comma would follow instead of a period
+\@for\bbx@entrytype:=article,inbook,incollection,inproceedings\do{
+  \expandafter\bbx@patchdriver\expandafter{\bbx@entrytype}
+    {\usebibmacro{in:}}
+    {\usebibmacro{date+extrayear}\newunit\usebibmacro{in:}}}
+\@for\bbx@entrytype:=book,collection,proceedings\do{
+  \expandafter\bbx@patchdriver\expandafter{\bbx@entrytype}
+    {\usebibmacro{maintitle+title}}
+    {\usebibmacro{date+extrayear}\newunit\usebibmacro{maintitle+title}}}
+\@for\bbx@entrytype:=booklet,manual,misc,online,patent,report,thesis,%
+  unpublished\do{
+  \expandafter\bbx@patchdriver\expandafter{\bbx@entrytype}
+    {\usebibmacro{title}}
+    {\usebibmacro{date+extrayear}\newunit\usebibmacro{title}}}
+\bbx@patchdriver{periodical}
+  {\usebibmacro{title+issuetitle}}
+  {\usebibmacro{date+extrayear}\newunit\usebibmacro{title+issuetitle}}
+
+% remove emphasized formatting for [title]
+\DeclareFieldFormat{title}{#1}
+
+% remove the colon after 'in'
+\renewcommand*\intitlepunct{\addspace}
+
+% remove 'in' before [journal] except for some entry types
+\renewbibmacro*{in:}{%
+  \ifboolexpr{
+    test {\ifentrytype{inbook}} or
+    test {\ifentrytype{incollection}} or
+    test {\ifentrytype{inproceedings}}
+  }{%
+    \printtext{\bibstring{in}\intitlepunct}%
+  }{}}
+
+% remove emphasized formatting for [journal] and treat trailing periods as
+% abbreviation dots
+\DeclareFieldFormat{journaltitle}{#1\isdot}
+
+% convert [journal] to a hyperlink
+\newbool{bbx:doiused}
+\newbibmacro*{link:doi}[1]{%
+  \ifboolexpr{
+    test {\ifhyperref} and
+    test {\iftoggle{bbx:embedlinks}} and
+    not test {\iffieldundef{doi}}
+  }{%
+    \printtext{\bbx@href\bbx@doilinkcolor
+      {http://dx.doi.org/\thefield{doi}}{#1}}%
+    \clearfield{doi}%
+    \global\booltrue{bbx:doiused}
+  }{#1}}
+\bbx@patchmacro{booktitle}
+  {\printfield[titlecase]{booktitle}}
+  {\usebibmacro{link:doi}{\printfield[titlecase]{booktitle}}}
+\bbx@apptomacro{booktitle}
+  {\ifbool{bbx:doiused}{\clearfield{doi}\global\boolfalse{bbx:doiused}}{}}
+\bbx@patchmacro{journal+issuetitle}
+  {\usebibmacro{journal}}
+  {\ifboolexpr{
+    test {\iffieldundef{journaltitle}} and
+    test {\iffieldundef{journalsubtitle}}
+  }{}{%
+    \usebibmacro{link:doi}{\usebibmacro{journal}}%
+  }}
+
+% add a comma after [journal]
+\bbx@patchmacro{journal+issuetitle}
+  {\setunit*{\addspace}}
+  {\setunit*{\addcomma\space}}
+
+% convert [volume] to a hyperlink
+\newbibmacro*{link:ads}[1]{%
+  \ifboolexpr{
+    test {\ifhyperref} and
+    test {\iftoggle{bbx:embedlinks}} and
+    not test {\iffieldundef{verba}}
+  }{%
+    \printtext{\bbx@href\bbx@adslinkcolor
+      {http://adsabs.harvard.edu/abs/\thefield{verba}}{#1}}%
+    \clearfield{verba}%
+  }{#1}}
+\bbx@patchmacro{volume+number+eid}
+  {\printfield{volume}}
+  {\iffieldundef{volume}{}{\usebibmacro{link:ads}{\printfield{volume}}}}
+\@for\bbx@entrytype:=book,collection,inbook,incollection,inproceedings,%
+  proceedings\do{
+  \expandafter\bbx@patchdriver\expandafter{\bbx@entrytype}
+    {\printfield{volume}}
+    {\iffieldundef{volume}{}{\usebibmacro{link:ads}{\printfield{volume}}}}
+  \expandafter\bbx@patchdriver\expandafter{\bbx@entrytype}
+    {\printfield{volumes}}
+    {\iffieldundef{volumes}{}{\usebibmacro{link:ads}{\printfield{volumes}}}}}
+
+% remove emphasized formatting for [booktitle]
+\DeclareFieldFormat{booktitle}{#1}
+
+% move [series] before [booktitle]
+\@for\bbx@entrytype:=inbook,incollection,inproceedings\do{
+  \expandafter\bbx@patchdriver\expandafter{\bbx@entrytype}
+    {\usebibmacro{series+number}}{}}
+\bbx@patchmacro{maintitle+booktitle}
+  {\usebibmacro{booktitle}}
+  {\iffieldundef{series}{}{\usebibmacro{series+number}\newunit}%
+    \usebibmacro{booktitle}}
+
+% enclose publisher information in parentheses
+\newbibmacro*{argument+location+date}[1]{%
+  \ifboolexpr{
+    test {\iflistundef{#1}} and
+    test {\iflistundef{location}}
+  }{}{%
+    \printtext[parens]{\usebibmacro{#1+location+date}}%
+  }}
+\@for\bbx@entrytype:=inproceedings,proceedings\do{
+  \expandafter\bbx@patchdriver\expandafter{\bbx@entrytype}
+    {\usebibmacro{publisher+location+date}}
+    {\setunit{\addspace}\usebibmacro{argument+location+date}{publisher}}}
+\@for\bbx@entrytype:=report,thesis\do{
+  \expandafter\bbx@patchdriver\expandafter{\bbx@entrytype}
+    {\usebibmacro{institution+location+date}}
+    {\setunit{\addspace}\usebibmacro{argument+location+date}{institution}}}
+\bbx@patchdriver{misc}
+  {\usebibmacro{organization+location+date}}
+  {\setunit{\addspace}\usebibmacro{argument+location+date}{organization}}
+
+% put [edition] inside the parentheses for publisher information
+\newbibmacro*{edition+publisher+location+date}{%
+  \ifboolexpr{
+    test {\iffieldundef{edition}} and
+    test {\iflistundef{publisher}} and
+    test {\iflistundef{location}}
+  }{}{%
+    \printtext[parens]{%
+      \printfield{edition}\setunit{\addsemicolon\space}%
+      \usebibmacro{publisher+location+date}}%
+  }}
+\@for\bbx@entrytype:=book,collection,inbook,incollection,manual\do{
+  \expandafter\bbx@patchdriver\expandafter{\bbx@entrytype}
+    {\printfield{edition}\newunit}{}
+  \expandafter\bbx@patchdriver\expandafter{\bbx@entrytype}
+    {\usebibmacro{publisher+location+date}}
+    {\setunit{\addspace}\usebibmacro{edition+publisher+location+date}}}
+
+% show only the first number in [pages]
+\DeclareFieldFormat{pages}{\mkfirstpage{#1}}
+
+% convert [pages] to a hyperlink
+\newbibmacro*{link:arxiv}[1]{%
+  \ifboolexpr{
+    test {\ifhyperref} and
+    test {\iftoggle{bbx:embedlinks}} and
+    not test {\iffieldundef{eprint}} and
+    test {\iffieldequalstr{eprinttype}{arXiv}}
+  }{%
+    \printtext{\bbx@href\bbx@arxivlinkcolor
+      {http://arxiv.org/\abx@arxivpath/\thefield{eprint}}{#1}}%
+    \clearfield{eprint}\clearfield{eprintclass}\clearfield{eprinttype}%
+  }{#1}}
+\bbx@patchmacro{note+pages}
+  {\printfield{pages}}
+  {\iffieldundef{pages}{}{\usebibmacro{link:arxiv}{\printfield{pages}}}}
+
+% change color of [doi] link
+\bbx@patchfieldformat{doi}
+  {\href}
+  {\bbx@href\bbx@doilinkcolor}
+% change color of arXiv [eprint] link
+\bbx@patchfieldformat{eprint:arxiv}
+  {\href}
+  {\bbx@href\bbx@arxivlinkcolor}
+
+% remove the final period
+\renewcommand*\finentrypunct{}
+
+% sort the bibliography
+\DeclareSortingScheme{nyc}{
+  \sort{\field{presort}}
+  \sort[final]{\field{sortkey}}
+  \sort{\field{sortname}\field{author}\field{editor}\field{translator}}
+  \sort{\field{sortyear}\field{year}}
+  \sort{\citeorder}
+}
+
+% end
+\endinput
