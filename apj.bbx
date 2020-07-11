@@ -213,11 +213,11 @@
 % put a unit separator between [author] and [year] that shows up as a space
 \renewcommand*\labelnamepunct{\addspace}
 \bbx@patchmacro{author}
-  {\usebibmacro{date+extrayear}}
-  {\setunit*{\printdelim{nametitledelim}}\usebibmacro{date+extrayear}}
+  {\usebibmacro{date+extradate}}
+  {\setunit*{\printdelim{nametitledelim}}\usebibmacro{date+extradate}}
 
 % remove parentheses around [year]
-\bbx@patchmacro{date+extrayear}{[parens]}{}
+\bbx@patchmacro{date+extradate}{[parens]}{}
 
 % remove emphasized formatting for [title]
 \DeclareFieldFormat{title}{#1}
@@ -280,7 +280,7 @@
 \DeclareNameAlias{sortname}{family-given}
 
 % sort bibliography
-\DeclareSortingScheme{nyc}{
+\DeclareSortingTemplate{nyc}{
   \sort{\field{presort}}
   \sort[final]{\field{sortkey}}
   \sort{\field{sortname}\field{author}\field{editor}\field{translator}}
