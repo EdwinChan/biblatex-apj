@@ -1,5 +1,5 @@
 % identification
-\ProvidesFile{apj.bbx}[2020/07/11 Biblatex bibliography style for ApJ]
+\ProvidesFile{apj.bbx}[2021/09/16 Biblatex bibliography style for ApJ]
 
 % utility macros
 \newcommand*\bbx@applytomacro[2]{%
@@ -70,9 +70,9 @@
 % [doi] link on text
 \newbibmacro*{link:doi}[1]{%
   \ifboolexpr{
-    test {\ifhyperref} and
-    test {\iftoggle{bbx:embedlinks}} and
-    not test {\iffieldundef{doi}}
+            test {\ifhyperref}
+    and     togl {bbx:embedlinks}
+    and not test {\iffieldundef{doi}}
   }{%
     \printtext{\bbx@href\bbx@doilinkcolor
       {https://doi.org/\thefield{doi}}{#1}}%
@@ -85,9 +85,9 @@
 % [bibcode] link on text
 \newbibmacro*{link:ads}[1]{%
   \ifboolexpr{
-    test {\ifhyperref} and
-    test {\iftoggle{bbx:embedlinks}} and
-    not test {\iffieldundef{verba}}
+            test {\ifhyperref}
+    and     togl {bbx:embedlinks}
+    and not test {\iffieldundef{verba}}
   }{%
     \printtext{\bbx@href\bbx@adslinkcolor
       % old URL: http://adsabs.harvard.edu/abs/\thefield{verba}
@@ -101,10 +101,10 @@
 % arXiv [eprint] link on text
 \newbibmacro*{link:arxiv}[1]{%
   \ifboolexpr{
-    test {\ifhyperref} and
-    test {\iftoggle{bbx:embedlinks}} and
-    not test {\iffieldundef{eprint}} and
-    test {\iffieldequalstr{eprinttype}{arXiv}}
+            test {\ifhyperref}
+    and     togl {bbx:embedlinks}
+    and not test {\iffieldundef{eprint}}
+    and     test {\iffieldequalstr{eprinttype}{arXiv}}
   }{%
     \printtext{\bbx@href\bbx@arxivlinkcolor
       {https://arxiv.org/\abx@arxivpath/\thefield{eprint}}{#1}}%
@@ -238,9 +238,9 @@
 % publisher information for [book]
 \newbibmacro*{edition+publisher+location}{%
   \ifboolexpr{
-    test {\iffieldundef{edition}} and
-    test {\iflistundef{publisher}} and
-    test {\iflistundef{location}}
+        test {\iffieldundef{edition}}
+    and test {\iflistundef{publisher}}
+    and test {\iflistundef{location}}
   }{%
   }{%
     \printtext[parens]{%
@@ -258,8 +258,8 @@
 % publisher information for [inproceedings]
 \newbibmacro*{publisher+location}{%
   \ifboolexpr{
-    test {\iflistundef{publisher}} and
-    test {\iflistundef{location}}
+        test {\iflistundef{publisher}}
+    and test {\iflistundef{location}}
   }{%
   }{%
     \printtext[parens]{%
