@@ -22,8 +22,8 @@
 
 % base bibliography style
 \RequireBibliographyStyle{authoryear-comp}
-\ExecuteBibliographyOptions{dashed=false, useprefix=true, giveninits=true,
-  maxbibnames=5, minbibnames=3, date=year, sorting=nyc}
+\ExecuteBibliographyOptions{useprefix=true, giveninits=true, maxbibnames=5,
+  minbibnames=3, date=year, sorting=nyc}
 
 % options
 \newtoggle{bbx:embedlinks}
@@ -210,6 +210,17 @@
 % change default punctuation between units
 \renewcommand*\newunitpunct{\addcomma\space}
 
+% use a comma before the last item in [author] even if there are only two items
+\DeclareDelimFormat{finalnamedelim}{%
+  \ifcurrentname{author}{\finalandcomma}{}%
+  \ifnumgreater{\value{liststop}}{2}{\finalandcomma}{}%
+  \addspace\bibstring{and}\space}
+
+% add a period after [author] dash
+\patchcmd\bibnamedash{\textemdash\space}{\textemdash\space.}{}{}
+\patchcmd\bibnamedash{\textendash}{\textendash.}{}{}
+\patchcmd\bibnamedash{{\textemdash}}{{\textemdash.}}{}{}
+
 % put a unit separator between [author] and [year] that shows up as a space
 \renewcommand*\labelnamepunct{\addspace}
 \bbx@patchmacro{author}
@@ -286,6 +297,13 @@
   \sort{\field{sortname}\field{author}\field{editor}\field{translator}}
   \sort{\field{sortyear}\field{year}}
   \sort{\citeorder}
+}
+% use only initials in sorting
+\DeclareSortingNamekeyTemplate{
+  \keypart{\namepart[use=true]{prefix}\namepart{family}}
+  \keypart{\namepart[inits]{given}}
+  \keypart{\namepart{suffix}}
+  \keypart{\namepart[use=false]{prefix}}
 }
 
 % end
