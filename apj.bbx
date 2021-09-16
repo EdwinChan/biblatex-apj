@@ -42,10 +42,12 @@
 
 % redefined bibliography strings
 \DefineBibliographyStrings{english}{
-  and     ={\&},
-  byeditor={ed\adddot},
-  volume  ={Vol\adddot},
-  volumes ={Vols\adddot}
+  and      = {\&},
+  byeditor = {ed\adddot},
+  volume   = {Vol\adddot},
+  volumes  = {Vols\adddot},
+  page     = {},
+  pages    = {}
 }
 
 % colored link
@@ -282,7 +284,7 @@
 }
 
 % show only first number in [pages]
-\DeclareFieldFormat{pages}{\mkfirstpage{#1}}
+\DeclareFieldFormat[article]{pages}{\mkfirstpage{#1}}
 
 % remove final period
 \renewcommand*\finentrypunct{}
