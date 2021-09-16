@@ -189,12 +189,7 @@
   \usebibmacro{begentry}%
   \usebibmacro{author}%
   \newunit\newblock
-  \usebibmacro{in:}%
-  \printfield{series}%
-  \setunit{\addspace}%
-  \printfield{volume}%
-  \newunit
-  \usebibmacro{field+link}{booktitle}{doi}%
+  \usebibmacro{series+volume+booktitle}%
   \newunit
   \usebibmacro{byeditor+others}%
   \setunit{\addspace}%
@@ -242,13 +237,28 @@
 % abbreviation dots
 \DeclareFieldFormat{journaltitle}{#1\isdot}
 
-% remove 'vol.' from [volume] for [inproceedings]
-\DeclareFieldFormat[inproceedings]{volume}{#1}
-
 % remove emphasized formatting for [booktitle]
 \DeclareFieldFormat{booktitle}{#1}
 
-% publisher information for [book]
+% series information for @inproceedings
+\newbibmacro*{series+volume+booktitle}{%
+  \ifboolexpr{
+        test {\iffieldundef{series}}
+    and test {\iffieldundef{volume}}
+    and test {\iffieldundef{booktitle}}
+  }{%
+  }{%
+    \usebibmacro{in:}%
+    \printunit{\addspace}%
+    \printfield{series}%
+    \newunit
+    \printfield{volume}%
+    \newunit
+    \usebibmacro{field+link}{booktitle}{doi}%
+  }%
+}
+
+% publisher information for @book
 \newbibmacro*{edition+publisher+location}{%
   \ifboolexpr{
         test {\iffieldundef{edition}}
@@ -268,7 +278,7 @@
   }%
 }
 
-% publisher information for [inproceedings]
+% publisher information for @inproceedings
 \newbibmacro*{publisher+location}{%
   \ifboolexpr{
         test {\iflistundef{publisher}}
