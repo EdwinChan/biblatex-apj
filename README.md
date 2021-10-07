@@ -1,5 +1,6 @@
 Probably the first `biblatex` style compatible with the citation and
-bibliography style of the Astrophysical Journal.
+bibliography style of the Astrophysical Journal. Examples of this style in use
+can be found at https://arxiv.org/a/0000-0001-5949-6109.
 
-The latest commit is not compatible with arXiv, which runs TeXLive 2016. Please
-use an earlier commit.
+To make the dashes for repeated authors longer, add
+`\setlength\bibhang{1.25em}` before `\printbibliography`.
