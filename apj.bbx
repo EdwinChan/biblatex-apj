@@ -1,7 +1,13 @@
 % identification
-\ProvidesFile{apj.bbx}[2021/09/16 Biblatex bibliography style for ApJ]
+\ProvidesFile{apj.bbx}[2023/12/08 Biblatex bibliography style for ApJ]
+
+% packages
+\RequirePackage{etoolbox}
 
 % utility macros
+\newcommand*\bbx@patchcmd[3]{%
+  \patchcmd#1{#2}{#3}
+  {}{\PackageError{biblatex}{Cannot patch macro \string#1}{}}}
 \newcommand*\bbx@applytomacro[2]{%
   \expandafter#1\csname abx@macro@\detokenize{#2}\endcsname}
 \newcommand*\bbx@applytodriver[2]{%
@@ -42,7 +48,6 @@
 
 % redefined bibliography strings
 \DefineBibliographyStrings{english}{
-  and      = {\&},
   byeditor = {ed\adddot},
   volume   = {Vol\adddot},
   volumes  = {Vols\adddot},
@@ -212,6 +217,11 @@
   \ifcurrentname{author}{\finalandcomma}{}%
   \ifnumgreater{\value{liststop}}{2}{\finalandcomma}{}%
   \addspace\bibstring{and}\space}
+
+% change 'and' in [author] to ampersand
+\bbx@patchcmd\finalnamedelim
+  {\bibstring{and}}
+  {\ifbibliography{\printtext{\&}}{\bibstring{and}}}
 
 % add a period after [author] dash
 \patchcmd\bibnamedash{\textemdash\space}{\textemdash\space.}{}{}

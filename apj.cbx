@@ -1,16 +1,28 @@
 % identification
-\ProvidesFile{apj.cbx}[2020/07/11 Biblatex citation style for ApJ]
+\ProvidesFile{apj.cbx}[2023/12/08 Biblatex citation style for ApJ]
+
+% utility macros
+\newcommand*\cbx@patchcmd[3]{%
+  \patchcmd#1{#2}{#3}
+  {}{\PackageError{biblatex}{Cannot patch macro \string#1}{}}}
 
 % base citation style
 \RequireCitationStyle{authoryear-comp}
 \ExecuteBibliographyOptions{maxcitenames=2, mincitenames=1, uniquename=false,
   uniquelist=false, sortcites=false}
 
+% redefined bibliography strings
+\DefineBibliographyStrings{english}{
+  citedas = {hereafter}
+}
+
+% change 'and' in [author] to ampersand
+\cbx@patchcmd\finalnamedelim
+  {\bibstring{and}}
+  {\ifcitation{\printtext{\&}}{\bibstring{and}}}
+
 % remove the comma after [author]
 \renewcommand*\nameyeardelim{\addspace}
-
-% redefined bibliography strings
-\DefineBibliographyStrings{english}{citedas={hereafter}}
 
 % end
 \endinput
