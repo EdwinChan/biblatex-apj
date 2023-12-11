@@ -34,13 +34,41 @@
 \ExecuteBibliographyOptions{useprefix=true, giveninits=true, maxbibnames=5,
   minbibnames=3, date=year, sorting=nyc}
 
-% options
+% option: link embedding
 \newtoggle{bbx:embedlinks}
 \DeclareBibliographyOption{embedlinks}[true]{\settoggle{bbx:embedlinks}{#1}}
 \DeclareBibliographyOption{doilinkcolor}{\def\bbx@doilinkcolor{#1}}
 \DeclareBibliographyOption{adslinkcolor}{\def\bbx@adslinkcolor{#1}}
 \DeclareBibliographyOption{arxivlinkcolor}{\def\bbx@arxivlinkcolor{#1}}
 \ExecuteBibliographyOptions{doilinkcolor=, adslinkcolor=, arxivlinkcolor=}
+
+% option: numeric bibliography
+\newtoggle{bbx:numeric}
+\DeclareBibliographyOption{numeric}[true]{
+  \settoggle{bbx:numeric}{#1}
+  \ifbool{#1}
+    {\ExecuteBibliographyOptions{sorting=none}}
+    {\ExecuteBibliographyOptions{sorting=nyc}}}
+\AtEndPreamble{
+  \iftoggle{bbx:numeric}{
+    \ExecuteBibliographyOptions{dashed=false}
+    \DeclareFieldFormat{labelnumberwidth}{\mkbibbrackets{#1}}
+    \defbibenvironment{bibliography}
+      {\list
+        {\printtext[labelnumberwidth]
+          {\printfield{labelprefix}\printfield{labelnumber}}}
+        {\setlength\labelwidth\labelnumberwidth
+         \setlength\labelsep\biblabelsep
+         \setlength\leftmargin\labelwidth
+         \addtolength\leftmargin\labelsep
+         \setlength\itemsep\bibitemsep
+         \setlength\parsep\bibparsep}%
+       \renewcommand*\makelabel[1]{\hss##1}}
+      {\endlist}
+      {\item}
+  }{
+  }
+}
 
 % new [bibcode] field
 \DeclareSourcemap{
