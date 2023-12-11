@@ -5,6 +5,9 @@
 \RequirePackage{etoolbox}
 
 % utility macros
+\newcommand*\bbx@pretocmd[2]{%
+  \pretocmd#1{#2}
+  {}{\PackageError{biblatex}{Cannot patch macro \string#1}{}}}
 \newcommand*\bbx@patchcmd[3]{%
   \patchcmd#1{#2}{#3}
   {}{\PackageError{biblatex}{Cannot patch macro \string#1}{}}}
@@ -213,10 +216,8 @@
 \renewcommand*\newunitpunct{\addcomma\space}
 
 % use a comma before the last item in [author] even if there are only two items
-\DeclareDelimFormat{finalnamedelim}{%
-  \ifcurrentname{author}{\finalandcomma}{}%
-  \ifnumgreater{\value{liststop}}{2}{\finalandcomma}{}%
-  \addspace\bibstring{and}\space}
+\bbx@pretocmd\finalnamedelim
+  {\ifcurrentname{author}{\finalandcomma}{}}
 
 % change 'and' in [author] to ampersand
 \bbx@patchcmd\finalnamedelim
@@ -224,9 +225,15 @@
   {\ifbibliography{\printtext{\&}}{\bibstring{and}}}
 
 % add a period after [author] dash
-\patchcmd\bibnamedash{\textemdash\space}{\textemdash\space.}{}{}
-\patchcmd\bibnamedash{\textendash}{\textendash.}{}{}
-\patchcmd\bibnamedash{{\textemdash}}{{\textemdash.}}{}{}
+\bbx@patchcmd\bibnamedash
+  {\textemdash\space}
+  {\textemdash\space.}
+\bbx@patchcmd\bibnamedash
+  {\textendash}
+  {\textendash.}
+\bbx@patchcmd\bibnamedash
+  {{\textemdash}}
+  {{\textemdash.}}
 
 % put a unit separator between [author] and [year] that shows up as a space
 \renewcommand*\labelnamepunct{\addspace}
