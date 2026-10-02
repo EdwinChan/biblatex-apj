@@ -242,6 +242,9 @@
   \usebibmacro{alias}%
   \usebibmacro{finentry}}
 
+% bibliography driver
+\DeclareBibliographyAlias{inbook}{inproceedings}
+
 % use American English punctuation rules
 \DeclareQuotePunctuation{.,}
 
@@ -344,7 +347,7 @@
 }
 
 % show only first number in [pages]
-\DeclareFieldFormat[article]{pages}{\mkfirstpage{#1}}
+\DeclareFieldFormat{pages}{\mkfirstpage{#1}}
 
 % remove final period
 \renewcommand*\finentrypunct{}
